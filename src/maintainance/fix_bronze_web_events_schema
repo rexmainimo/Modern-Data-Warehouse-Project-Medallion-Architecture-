@@ -1,0 +1,31 @@
+import pandas as pd
+import glob
+
+BRONZE_PATH = "data/bronze/web_events/"
+
+files = glob.glob(BRONZE_PATH + "**/*.parquet", recursive=True)
+print(f"Fixing {len(files)} files")
+
+for f in files:
+    df = pd.read_parquet(f)
+
+    # remove partition column
+    df = df.drop(columns=["ingestion_date"], errors="ignore")
+
+    # normalize timestamps
+    if "ingestion_timestamp" in df.columns:
+        df["ingestion_timestamp"] = pd.to_datetime(df["ingestion_timestamp"])
+
+    # UUID columns → string
+    for col in ["event_id", "session_id"]:
+        if col in df.columns:
+            df[col] = df[col].astype("string")
+
+    # numeric IDs → nullable Int64
+    for col in ["customer_id", "product_id"]:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
+
+    df.to_parquet(f, index=False)
+
+print("Bronze web events schema fixed successfully")

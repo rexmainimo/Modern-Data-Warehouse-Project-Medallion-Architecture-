@@ -1,0 +1,29 @@
+import pandas as pd
+import glob
+
+BRONZE_PATH = "data/bronze/orderItems/"
+
+files = glob.glob(
+    BRONZE_PATH + "**/*.parquet",
+    recursive=True
+)
+
+print(f"Found {len(files)} parquet files")
+
+for f in files:
+    df = pd.read_parquet(f)
+
+    # ❌ remove partition column
+    df = df.drop(columns=["ingestion_date"], errors="ignore")
+
+    # ✅ normalize timestamps
+    if "ingestion_timestamp" in df.columns:
+        df["ingestion_timestamp"] = pd.to_datetime(df["ingestion_timestamp"])
+
+    # Optional but good
+    if "order_item_id" in df.columns:
+        df["order_item_id"] = df["order_item_id"].astype(int)
+
+    df.to_parquet(f, index=False)
+
+print("Bronze orderItems schema fixed successfully")

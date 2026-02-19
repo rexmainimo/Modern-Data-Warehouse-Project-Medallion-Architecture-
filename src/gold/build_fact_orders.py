@@ -1,37 +1,31 @@
 import pandas as pd
 from pathlib import Path
 
-# Paths
 ORDERS_PATH = "data/silver/orders/orders.parquet"
 CUSTOMERS_PATH = "data/gold/dimensions/dim_customers.parquet"
-PRODUCTS_PATH = "data/gold/dimensions/dim_products.parquet"
 DATE_PATH = "data/gold/dimensions/dim_date.parquet"
-FX_PATH = "data/silver/exchange_rates/exchange_rates.parquet"
+ORDER_ITEMS_PATH = "data/gold/facts/fact_order_items.parquet"
 
 GOLD_PATH = "data/gold/facts/fact_orders.parquet"
 Path(GOLD_PATH).parent.mkdir(parents=True, exist_ok=True)
 
-# Load data
+# -----------------------------------------
+# 1️⃣ Load Data
+# -----------------------------------------
+
 orders = pd.read_parquet(ORDERS_PATH)
 customers = pd.read_parquet(CUSTOMERS_PATH)
-products = pd.read_parquet(PRODUCTS_PATH)
 dates = pd.read_parquet(DATE_PATH)
-fx = pd.read_parquet(FX_PATH)
+order_items = pd.read_parquet(ORDER_ITEMS_PATH)
 
+# -----------------------------------------
+# 2️⃣ Date Handling
+# -----------------------------------------
 
-orders = orders.merge(
-    customers[["customer_id", "customer_key"]],
-    on="customer_id",
-    how="left"
-)
+orders["order_date"] = pd.to_datetime(orders["order_date"])
+orders["order_date"] = orders["order_date"].dt.normalize()
 
-orders = orders.merge(
-    products[["product_id", "product_key"]],
-    on="product_id",
-    how="left"
-)
-
-orders["order_date"] = pd.to_datetime(orders["order_timestamp"]).dt.date
+dates["date"] = pd.to_datetime(dates["date"])
 
 orders = orders.merge(
     dates[["date", "date_key"]],
@@ -41,39 +35,61 @@ orders = orders.merge(
 )
 
 orders = orders.rename(columns={"date_key": "order_date_key"})
-orders = orders.drop(columns=["date"])
+orders = orders.drop(columns=["date", "order_date"])
 
-fx["rate_date"] = pd.to_datetime(fx["rate_date"]).dt.date
+# -----------------------------------------
+# 3️⃣ Join Customer Dimension
+# -----------------------------------------
 
 orders = orders.merge(
-    fx,
-    left_on=["order_date", "currency"],
-    right_on=["rate_date", "target_currency"],
+    customers[["customer_id", "customer_key"]],
+    on="customer_id",
     how="left"
 )
 
-orders["order_amount_eur"] = (
-    orders["order_amount_local"] / orders["exchange_rate"]
+# -----------------------------------------
+# 4️⃣ Aggregate Revenue From Line Fact
+# -----------------------------------------
+
+order_revenue = (
+    order_items
+    .groupby("order_id", as_index=False)
+    .agg({
+        "line_amount_eur": "sum",
+        "quantity": "sum"
+    })
 )
+
+orders = orders.merge(
+    order_revenue,
+    on="order_id",
+    how="left"
+)
+
+orders["line_amount_eur"] = orders["line_amount_eur"].fillna(0)
+orders["quantity"] = orders["quantity"].fillna(0)
+
+orders = orders.rename(columns={
+    "line_amount_eur": "total_order_amount_eur",
+    "quantity": "total_quantity"
+})
+
+# -----------------------------------------
+# 5️⃣ Final Fact Selection
+# -----------------------------------------
 
 fact_orders = orders[
     [
-        "order_id",
-        "customer_key",
-        "product_key",
+        "order_id",                 # degenerate dimension
         "order_date_key",
+        "customer_key",
+        "order_status",
         "currency",
-        "order_amount_local",
-        "order_amount_eur",
-        "quantity"
+        "total_quantity",
+        "total_order_amount_eur"
     ]
 ]
 
-# Drop orders missing mandatory keys
-fact_orders = fact_orders.dropna(
-    subset=["customer_key", "product_key", "order_date_key"]
-)
-
 fact_orders.to_parquet(GOLD_PATH, index=False)
-print("fact_orders built successfully")
 
+print("fact_orders built successfully")

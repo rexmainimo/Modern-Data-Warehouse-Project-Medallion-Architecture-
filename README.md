@@ -1,54 +1,39 @@
 # Modern-Data-Warehouse-Project-Medallion-Architecture-
 
-📊 Modern Data Warehouse (Medallion Architecture)
+📊 Modern Data Warehouse – Medallion Architecture
+
 🚀 Overview
 
-This project implements an end-to-end data warehouse using a Medallion Architecture (Bronze → Silver → Gold) with Python and Parquet.
+This project implements an end-to-end data warehouse using a Medallion Architecture (Bronze → Silver → Gold) built with Python and Parquet.
 
-It simulates a real-world data engineering pipeline including raw ingestion, schema standardization, data transformation, and dimensional modeling.
+It simulates a real-world analytics engineering workflow: ingesting raw data, cleaning and standardizing it, and transforming it into a dimensional model ready for business reporting.
 
 🏗 Architecture
+🥉 Bronze Layer
 
-Bronze
-
-Raw data ingestion
-
-Partitioned Parquet files
+Raw data ingestion (partitioned Parquet)
 
 Minimal transformation
 
-Silver
+Schema preservation
+
+🥈 Silver Layer
 
 Cleaned and standardized datasets
 
-Schema enforcement
-
 Data type normalization
 
-Deduplication
+Deduplication logic
 
-Gold
+Schema enforcement
 
-Star schema modeling
+Exchange rate preparation
 
-Dimension tables with surrogate keys
+🥇 Gold Layer (Star Schema)
 
-Analytics-ready datasets
+Analytics-ready dimensional model with surrogate keys.
 
-✅ Implemented
-Data Domains
-
-Customers
-
-Products
-
-Orders
-
-Web Events
-
-Exchange Rates
-
-Gold Dimensions
+Dimensions
 
 dim_customers
 
@@ -56,25 +41,29 @@ dim_products
 
 dim_date
 
-Engineering Highlights
+Fact Tables
 
-Partitioned Parquet handling
+fact_orders (1 row per order)
 
-Schema drift resolution
+fact_order_items (1 row per product per order)
 
-Bronze schema maintenance layer
+fact_web_events (1 row per web event)
 
-Currency normalization foundation
+The model supports retail sales analytics and digital engagement analysis.
 
-Clean directory structure & modular scripts
+📈 Business Domains Modeled
 
-🔜 Next Step
+Customers
 
-Implement fact_orders
+Products
 
-Implement fact_web_events
+Orders
 
-Join exchange rates for normalized revenue analytics
+Order Items
+
+Web Events
+
+Exchange Rates (currency normalization)
 
 🛠 Tech Stack
 
@@ -86,14 +75,22 @@ PyArrow
 
 Parquet
 
-Star Schema modeling
+Dimensional Modeling (Star Schema)
 
-🎯 What This Demonstrates
+Medallion Architecture
+
+🎯 What This Project Demonstrates
 
 End-to-end data pipeline design
 
-Medallion architecture implementation
+Practical implementation of Medallion Architecture
 
-Data warehouse modeling fundamentals
+Dimensional modeling with conformed dimensions
 
-Real-world schema troubleshooting
+Fact table design at multiple grains
+
+Revenue normalization with exchange rates
+
+Real-world schema and data type troubleshooting
+
+Clean, modular pipeline structure

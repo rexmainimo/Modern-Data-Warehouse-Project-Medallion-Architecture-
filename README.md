@@ -1,103 +1,82 @@
-# Modern-Data-Warehouse-Project-Medallion-Architecture-
+# Modern Data Warehouse Project (Medallion Architecture)
 
-📊 Modern Data Warehouse – Medallion Architecture
-
-🚀 Overview
-
-This project implements an end-to-end data warehouse using a Medallion Architecture (Bronze → Silver → Gold) built with Python and Parquet.
+## 📊 Overview
+This project implements an end-to-end data warehouse using a Medallion Architecture (Bronze → Silver → Gold) built with Python and Parquet, and extended with PostgreSQL for analytical querying.
 
 It simulates a real-world analytics engineering workflow: ingesting raw data, cleaning and standardizing it, and transforming it into a dimensional model ready for business reporting.
 
-🏗 Architecture
-🥉 Bronze Layer
+---
 
-Raw data ingestion (partitioned Parquet)
+## 🏗 Architecture
 
-Minimal transformation
+### 🥉 Bronze Layer
+- Raw data ingestion (CSV, JSON, API)
+- Stored as partitioned Parquet files
+- Minimal transformation, schema preserved
 
-Schema preservation
+### 🥈 Silver Layer
+- Cleaned and standardized datasets
+- Data type normalization and schema enforcement
+- Deduplication logic applied
+- Exchange rates prepared for currency normalization
 
-🥈 Silver Layer
-
-Cleaned and standardized datasets
-
-Data type normalization
-
-Deduplication logic
-
-Schema enforcement
-
-Exchange rate preparation
-
-🥇 Gold Layer (Star Schema)
-
+### 🥇 Gold Layer (Star Schema)
 Analytics-ready dimensional model with surrogate keys.
 
-Dimensions
+**Dimensions**
+- dim_customers  
+- dim_products  
+- dim_date  
 
-dim_customers
+**Fact Tables**
+- fact_orders (1 row per order)  
+- fact_order_items (1 row per product per order)  
+- fact_web_events (1 row per web event)  
 
-dim_products
+Supports both **sales analytics** and **user behavior analysis**.
 
-dim_date
+---
 
-Fact Tables
+## 🗄 Data Warehouse Layer
+- Gold layer loaded into **PostgreSQL**
+- Enables SQL-based querying and validation
+- Tested using DBeaver
 
-fact_orders (1 row per order)
+---
 
-fact_order_items (1 row per product per order)
+## 📈 Business Domains Modeled
+- Customers  
+- Products  
+- Orders  
+- Order Items  
+- Web Events  
+- Exchange Rates (currency normalization)
 
-fact_web_events (1 row per web event)
+---
 
-The model supports retail sales analytics and digital engagement analysis.
+## 🛠 Tech Stack
+- Python  
+- Pandas  
+- PyArrow  
+- Parquet  
+- PostgreSQL  
+- Dimensional Modeling (Star Schema)  
+- Medallion Architecture  
 
-📈 Business Domains Modeled
+---
 
-Customers
+## 🎯 What This Project Demonstrates
+- End-to-end data pipeline design  
+- Medallion architecture implementation  
+- Dimensional modeling with multiple fact table grains  
+- Currency normalization using exchange rates  
+- Handling real-world data issues (schema drift, nulls, type conflicts)  
+- Building a queryable data warehouse (PostgreSQL)  
+- Clean, modular pipeline structure  
 
-Products
+---
 
-Orders
-
-Order Items
-
-Web Events
-
-Exchange Rates (currency normalization)
-
-🛠 Tech Stack
-
-Python
-
-Pandas
-
-PyArrow
-
-Parquet
-
-Dimensional Modeling (Star Schema)
-
-Medallion Architecture
-
-🎯 What This Project Demonstrates
-
-End-to-end data pipeline design
-
-Practical implementation of Medallion Architecture
-
-Dimensional modeling with conformed dimensions
-
-<<<<<<< HEAD
-Fact table design at multiple grains
-
-Revenue normalization with exchange rates
-
-Real-world schema and data type troubleshooting
-
-Clean, modular pipeline structure
-=======
-Real-world schema troubleshooting
-
-
-- Planned enhancements: orchestration with Airflow, PostgreSQL data warehouse layer, and Docker-based pipeline deployment
->>>>>>> 5da43a7 (modified files)
+## 🔜 Next Steps
+- Workflow orchestration with Airflow  
+- Containerization using Docker Compose  
+- Incremental loading strategies (replace → append/upsert)  

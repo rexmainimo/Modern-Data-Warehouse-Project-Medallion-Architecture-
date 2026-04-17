@@ -1,11 +1,4 @@
 
-
-# BRONZE_FILE = (
-#     "data/bronze/customers/"
-#     "ingestion_date=2026-02-04/"
-#     "customers_171918.parquet"
-# )
-
 import pandas as pd
 import glob
 

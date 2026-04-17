@@ -87,6 +87,7 @@ Practical implementation of Medallion Architecture
 
 Dimensional modeling with conformed dimensions
 
+<<<<<<< HEAD
 Fact table design at multiple grains
 
 Revenue normalization with exchange rates
@@ -94,3 +95,9 @@ Revenue normalization with exchange rates
 Real-world schema and data type troubleshooting
 
 Clean, modular pipeline structure
+=======
+Real-world schema troubleshooting
+
+
+- Planned enhancements: orchestration with Airflow, PostgreSQL data warehouse layer, and Docker-based pipeline deployment
+>>>>>>> 5da43a7 (modified files)

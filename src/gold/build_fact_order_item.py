@@ -1,14 +1,12 @@
 import pandas as pd
 from pathlib import Path
-
-
 import pandas as pd
 from pathlib import Path
 
 # Paths
 ORDER_ITEMS_PATH = "data/silver/orderItems/orderItems.parquet"
 ORDERS_PATH = "data/silver/orders/orders.parquet"
-CUSTOMERS_PATH = "data/gold/dimensions/dim_customers.parquet"
+CUSTOMERS_PATH = "data/gold/dimensions/dim_customers.parquet"   
 PRODUCTS_PATH = "data/gold/dimensions/dim_products.parquet"
 DATE_PATH = "data/gold/dimensions/dim_date.parquet"
 FX_PATH = "data/silver/exchange_rates/exchange_rates.parquet"

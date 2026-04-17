@@ -20,7 +20,7 @@ for f in files:
     if "ingestion_timestamp" in df.columns:
         df["ingestion_timestamp"] = pd.to_datetime(df["ingestion_timestamp"])
 
-    # Optional but good
+    # convert order_id to int 
     if "order_id" in df.columns:
         df["order_id"] = df["order_id"].astype(int)
 

@@ -1,82 +1,85 @@
-# Modern Data Warehouse Project (Medallion Architecture)
+## 📦 Modern Data Warehouse – Medallion Architecture
+    ** Production-style data pipeline with orchestration, data modeling, and warehouse loading
+### 📌 Overview
 
-## 📊 Overview
-This project implements an end-to-end data warehouse using a Medallion Architecture (Bronze → Silver → Gold) built with Python and Parquet, and extended with PostgreSQL for analytical querying.
+This project demonstrates an end-to-end data engineering pipeline implementing a Medallion Architecture (Bronze → Silver → Gold) using Python, Airflow, and PostgreSQL.
 
-It simulates a real-world analytics engineering workflow: ingesting raw data, cleaning and standardizing it, and transforming it into a dimensional model ready for business reporting.
+The pipeline ingests raw data, processes it into clean datasets, and loads analytical models into a data warehouse for reporting and business insights.
 
+
+## 🏗️ Architecture
+Raw Data → Bronze → Silver → Gold → PostgreSQL (DWH)
+                ↓
+             Airflow (Orchestration)
 ---
 
-## 🏗 Architecture
+### ⚙️ Tech Stack
+- Python (ETL pipelines)
+- SQL (data modeling & transformations, Star Schema)
+- Apache Airflow (orchestration)
+- PostgreSQL (data warehouse)
+- Parquet (data storage format)
+- Docker (environment setup)
+- SQLAlchemy (database connection)
 
-### 🥉 Bronze Layer
-- Raw data ingestion (CSV, JSON, API)
+---
+## 🔄 Pipeline Flow
+### 1. Bronze Layer
+- Raw ingestion from source systems
 - Stored as partitioned Parquet files
-- Minimal transformation, schema preserved
+- Schema preserved
 
-### 🥈 Silver Layer
-- Cleaned and standardized datasets
-- Data type normalization and schema enforcement
-- Deduplication logic applied
-- Exchange rates prepared for currency normalization
+### 2. Silver Layer
+- Data cleaning & transformation
+- Type normalization
+- Deduplication
+- Handling schema drift
+### 3. Gold Layer
+- Star schema modeling
+- Dimension tables:
+-dim_customers
+-dim_products
+-dim_date
+-Fact tables:
+-fact_orders
+-fact_order_items
+-fact_web_events
+-🗄️ Data Warehouse (PostgreSQL)
+Schemas:
+    bronze
+    silver
+    gold
+    Data loaded using Python + SQLAlchemy
+    Automated via Airflow DAG
+    ⚡ Orchestration (Airflow)
+    DAG: ecommerce_pipeline
+    Tasks:
+    Data ingestion
+    Transformation
+    Load to PostgreSQL
+    Includes:
+    Retry handling
+    Task dependencies
+    Logging
 
-### 🥇 Gold Layer (Star Schema)
-Analytics-ready dimensional model with surrogate keys.
+### 🚧 Challenges & Solutions
+❌ SQLAlchemy transaction error
+- Issue: .commit() not supported on connection
+- Fix: Switched to engine.begin() for transaction handling
+### ❌ PostgreSQL authentication issue
+- Issue: Wrong user credentials
+- Fix: Aligned credentials across Airflow & database client
 
-**Dimensions**
-- dim_customers  
-- dim_products  
-- dim_date  
+## 📊 Business Value
+- Enables structured analytics on:
+- Revenue trends
+- Customer behavior
+- Product performance
+- Provides clean datasets for BI tools (Power BI, Tableau)
 
-**Fact Tables**
-- fact_orders (1 row per order)  
-- fact_order_items (1 row per product per order)  
-- fact_web_events (1 row per web event)  
+## 🚀 Future Improvements
+- Add dbt for transformation layer
+- Implement data quality checks
+- Add CI/CD pipeline
+- Deploy to cloud (AWS/GCP/Azure)
 
-Supports both **sales analytics** and **user behavior analysis**.
-
----
-
-## 🗄 Data Warehouse Layer
-- Gold layer loaded into **PostgreSQL**
-- Enables SQL-based querying and validation
-- Tested using DBeaver
-
----
-
-## 📈 Business Domains Modeled
-- Customers  
-- Products  
-- Orders  
-- Order Items  
-- Web Events  
-- Exchange Rates (currency normalization)
-
----
-
-## 🛠 Tech Stack
-- Python  
-- Pandas  
-- PyArrow  
-- Parquet  
-- PostgreSQL  
-- Dimensional Modeling (Star Schema)  
-- Medallion Architecture  
-
----
-
-## 🎯 What This Project Demonstrates
-- End-to-end data pipeline design  
-- Medallion architecture implementation  
-- Dimensional modeling with multiple fact table grains  
-- Currency normalization using exchange rates  
-- Handling real-world data issues (schema drift, nulls, type conflicts)  
-- Building a queryable data warehouse (PostgreSQL)  
-- Clean, modular pipeline structure  
-
----
-
-## 🔜 Next Steps
-- Workflow orchestration with Airflow  
-- Containerization using Docker Compose  
-- Incremental loading strategies (replace → append/upsert)  

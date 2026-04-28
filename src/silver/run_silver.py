@@ -1,5 +1,6 @@
 import os
 
+
 print("Running Silver transformations...")
 
 os.system("python /opt/airflow/src/silver/transform_customers.py")
@@ -9,3 +10,4 @@ os.system("python /opt/airflow/src/silver/transform_web_events.py")
 os.system("python /opt/airflow/src/silver/transform_exchange_rates.py")
 
 print("Silver layer completed")
+from src.silver.transform_customers import main

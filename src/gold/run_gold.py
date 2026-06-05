@@ -1,4 +1,7 @@
-import os
+import os 
+
+# I use this for local testing of the gold transformations. 
+# ecommerce_pipeline calls them directly to ensure error logging if any script fails and easier troubleshooting.
 
 print("Building Gold layer...")
 

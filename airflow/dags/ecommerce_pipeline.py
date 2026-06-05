@@ -5,7 +5,7 @@ from airflow.models.baseoperator import chain
 
 
 default_args = {
-    "owner": "data_engineer",
+    "owner": "Rex Mainimo",
     "retries": 1,
 }
 
@@ -20,6 +20,9 @@ with DAG(
     # -------------------------
     # Bronze
     # -------------------------
+    # Bronze ingestion is a single task that runs all the bronze scripts. 
+    # Bronze logic is trivial for now.
+    
     bronze_ingest = BashOperator(
         task_id="bronze_ingest",
         bash_command="python /opt/airflow/src/bronze/run_bronze.py"
@@ -28,6 +31,11 @@ with DAG(
     # -------------------------
     # Silver
     # -------------------------
+    # silver transformations are separate tasks to allow for better error logging and easier 
+    # troubleshooting. Each script is called directly to ensure any errors are logged in Airflow.
+    # silver transfomrations are complex unlike bronze, so I want to be able to easily identify
+    # which script is failing if there are any issues.
+   
     silver_customers = BashOperator(
         task_id="silver_customers",
         bash_command="python /opt/airflow/src/pipelines/run_silver_customers.py"
@@ -61,6 +69,11 @@ with DAG(
     # -------------------------
     # Gold Dimensions
     # -------------------------
+    # gold ingestion is also separated into dimensions and facts. Dimensions are independent of 
+    # each other, so they can run in parallel after silver is complete. Facts depend on all 
+    # dimensions, so they will run after all dimensions are complete.
+    # I call each script directly to ensure any errors are logged in Airflow and easier 
+    # troubleshooting if there are any issues with the transformations in the future.
     dim_customers = BashOperator(
         task_id="dim_customers",
         bash_command="python /opt/airflow/src/pipelines/run_dim_customers.py"
@@ -97,6 +110,8 @@ with DAG(
     # -------------------------
     # PostgreSQL Load
     # -------------------------
+    # Finally, I load to PostGreSQL. Might as well call it directly here to ensure any errors 
+    # are logged in Airflow and easier troubleshooting if there are any issues with the load in the future.
     load_postgres = BashOperator(
         task_id="load_postgres",
         bash_command="python /opt/airflow/src/pipelines/load_to_postgres.py"
@@ -143,33 +158,3 @@ with DAG(
     # Facts → PostgreSQL
     fact_tasks >> load_postgres
 
-
-
-# with DAG(
-#     dag_id="ecommerce_pipeline",
-#     start_date=datetime(2024, 1, 1),
-#     schedule_interval=None,
-#     catchup=False
-# ) as dag:
-
-#     bronze = BashOperator(
-#         task_id="bronze",
-#         bash_command="python /opt/airflow/src/bronze/run_bronze.py"
-#     )
-
-#     silver = BashOperator(
-#         task_id="silver",
-#         bash_command="python /opt/airflow/src/silver/run_silver.py"
-#     )
-
-#     gold = BashOperator(
-#         task_id="gold",
-#         bash_command="python /opt/airflow/src/gold/run_gold.py"
-#     )
-
-#     load = BashOperator(
-#         task_id="load",
-#         bash_command="python /opt/airflow/src/load/run_load.py"
-#     )
-
-#     bronze >> silver >> gold >> load
